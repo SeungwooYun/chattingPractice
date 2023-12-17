@@ -8,9 +8,14 @@ module.exports = function (io) {
             // 이미 있는 유저인지 확인
             try {
                 const user = await userController.saveUser(userName, socket.id)
-                cb({ ok: true, data: user })
+                const welcomeMessage = {
+                    chat: `${user.name} joined to this room`,
+                    user: { id: null, name: "system" },
+                };
+                io.emit("message", welcomeMessage);
+                cb({ ok: true, data: user });
             } catch (err) {
-                cb({ ok: false, error: err.message })
+                cb({ ok: false, error: err.message });
             }
         }
         )
