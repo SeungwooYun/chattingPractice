@@ -1,3 +1,4 @@
+const chatController = require("../Controllers/chat.controller");
 const userController = require("../Controllers/user.controller")
 module.exports = function (io) {
     io.on("connection", async (socket) => {
@@ -13,6 +14,19 @@ module.exports = function (io) {
             }
         }
         )
+
+        socket.on("sendMessage", async (message, cb) => {
+            try {
+                const user = await userController.checkUser(socket.id)
+                const newMessage = await chatController.saveChat(message, user)
+                io.emit("message", newMessage)
+                cb({ ok: true })
+            } catch (err) {
+                cb({ ok: false, error: err.message })
+            }
+        })
+
+
         socket.on("disconnect", () => {
             console.log("user", socket.id, "is disconnected")
         })
